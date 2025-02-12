@@ -13,3 +13,8 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
+### Instalar Librerias
+```
+pip install -r requirements.txt
+```
+
