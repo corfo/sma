@@ -30,3 +30,14 @@ python manage.py createsuperuser --username admin
 ```
 email: admin@sma.cl  
 password: admin123  
+
+# queries
+```
+select t1.nombre , t3.nombre , t5.nombre , t7.nombre , t6.periodo , t6.valor  from app_ppda_ppda t1  
+inner join app_ppda_ppdaorganismo t2 on t1.id = t2.ppda_id  
+inner join app_ppda_organismo t3 on t2.organismo_id = t3.id  
+inner join app_ppda_ppdaorganismo_medidas t4 on t4.ppdaorganismo_id =t2.id  
+inner join app_ppda_medida t5 on t5.id = t4.medida_id  
+inner join app_ppda_medidaindicador t6 on t6.medida_id = t5.id  
+inner join app_ppda_indicador t7 on t7.id = t6.indicador_id  
+```
