@@ -6,7 +6,7 @@ class PpdaOrganismo(models.Model):
     medidas = models.ManyToManyField("Medida", related_name="medidas", blank=True)
 
     def __str__(self):
-        return f"{self.ppda.nombre} - {self.organismo.nombre}"
+        return f"pk:{self.pk} {self.ppda.nombre} - {self.organismo.nombre}"
 
 class Ppda(models.Model):
     nombre = models.CharField(
@@ -20,7 +20,7 @@ class Ppda(models.Model):
     organismos = models.ManyToManyField("Organismo", through="PpdaOrganismo", related_name="organismos", blank=True)
 
     def __str__(self):
-        return self.nombre
+        return f"ppda_nombre:{self.nombre} ppda_fecha_creacion:{self.fecha_creacion}"
 
 class Comuna(models.Model):
     nombre = models.CharField(
@@ -37,7 +37,7 @@ class Comuna(models.Model):
     )
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} ({self.codigo})"
 
 
 class Indicador(models.Model):
