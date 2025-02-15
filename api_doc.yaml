@@ -1,0 +1,105 @@
+openapi: 3.0.3
+info:
+  title: API SMA
+  version: 1.0.0
+  description: Documentación de la API SMA
+paths:
+  /api/add/:
+    post:
+      operationId: api_add_create
+      description: endpoint para cargar indicadores a un PPDA
+      summary: Add indicadores
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Indicador'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Indicador'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Indicador'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          description: Indicadores agregados correctamente
+        '400':
+          description: Error en la solicitud
+  /api/healthy/:
+    get:
+      operationId: api_healthy_retrieve
+      description: Este endpoint responde a una solicitud GET con un mensaje de exito
+        200 OK
+      summary: Healthy endpoint - GET
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+    post:
+      operationId: api_healthy_create
+      description: Este endpoint responde a una solicitud POST con un mensaje de exito
+        201 Created
+      summary: Healthy endpoint - POST
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+components:
+  schemas:
+    Indicador:
+      type: object
+      properties:
+        medida:
+          type: string
+          maxLength: 100
+        ppda:
+          type: string
+          maxLength: 100
+        periodo:
+          type: string
+          maxLength: 100
+        charlas_realizadas:
+          type: string
+          maxLength: 100
+        charlas_programadas:
+          type: string
+          maxLength: 100
+      required:
+      - charlas_programadas
+      - charlas_realizadas
+      - medida
+      - periodo
+      - ppda
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
