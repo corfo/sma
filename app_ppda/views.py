@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema
 from .serializers import IndicadorSerializer
 from .models import Ppda, PpdaOrganismo, Medida, Indicador, MedidaIndicador
 from drf_spectacular.utils import extend_schema, OpenApiResponse
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
 
 # Create your views here.
@@ -65,7 +65,7 @@ class Add(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Healthy(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     @extend_schema(
         summary="Healthy endpoint - GET",
         description="Este endpoint responde a una solicitud GET con un mensaje de exito 200 OK",
