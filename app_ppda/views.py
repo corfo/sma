@@ -7,12 +7,13 @@ from drf_spectacular.utils import extend_schema
 from .serializers import IndicadorSerializer
 from .models import Ppda, PpdaOrganismo, Medida, Indicador, MedidaIndicador
 from drf_spectacular.utils import extend_schema, OpenApiResponse
-
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
 # Create your views here.
 
 class Add(APIView):
+    permission_classes = [IsAuthenticated]
     @extend_schema(
         summary="Add indicadores",
         description='endpoint para cargar indicadores a un PPDA',
@@ -64,6 +65,7 @@ class Add(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Healthy(APIView):
+    permission_classes = [IsAuthenticated]
     @extend_schema(
         summary="Healthy endpoint - GET",
         description="Este endpoint responde a una solicitud GET con un mensaje de exito 200 OK",

@@ -31,6 +31,8 @@ python manage.py createsuperuser --username admin
 email: admin@sma.cl  
 password: admin123  
 
+usuario normal prueba pass Prue.,12389
+
 # queries
 ```
 select t1.nombre , t3.nombre , t5.nombre , t7.nombre , t6.periodo , t6.valor  from app_ppda_ppda t1  

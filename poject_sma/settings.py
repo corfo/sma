@@ -138,10 +138,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
 }
+
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'API SMA',
     'DESCRIPTION': 'Documentación de la API SMA',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
