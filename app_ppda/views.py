@@ -13,6 +13,8 @@ from dal import autocomplete
 from django.utils.html import escape
 from django.http import HttpResponseForbidden
 from rest_framework.generics import ListAPIView
+from datetime import datetime
+
 
 # Create your views here.
 class PpdaListAPIView(ListAPIView):
@@ -102,68 +104,84 @@ class Add(APIView):
                     )
         except Exception as e:
             print(f"Error: {e}")
-            raise Http404("Indicador ya ingresado")
-            
+            raise Http404("Indicador ya ingresado")            
         return Response({"message": "Registros creados correctamente"}, status=status.HTTP_201_CREATED)
-'''
-        serializer = IndicadorSerializer(data=request.data)
-        if serializer.is_valid():
-            print(serializer.validated_data)
-            ppda = get_object_or_404(Ppda, nombre=serializer.validated_data["ppda"])
-            print(f"PPDA nombre:{ppda.nombre} id:{ppda.id}")
-            #for medida in ppda.medidas.all():
-            #    print(f"Medida: {medida.nombre}")
-            #
-            #medida = ppda.medidas.filter(nombre__iexact=serializer.validated_data["medida"]).first()
-            #if not medida:
-            #    return Response({"error": f"No se encontró la medida '{serializer.validated_data['medida']}' para este PPDA."}, status=404)
-            medida = get_object_or_404(ppda.medidas, nombre__iexact=serializer.validated_data['medida'])
-            print(f"MEDIDA nombre:{medida.nombre} id:{medida.id}")
-            ppda_medida = get_object_or_404(PpdaMedida, ppda=ppda, medida=medida)
-            print(f"ppda_medida id:{ppda_medida.id}")
-            try:
-                a=0
-            except Exception as e:
-                print(f"Error: {e}")
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"message": f"ok"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-'''
 
-'''
-class Add(APIView):
+class DeleteRegistrosAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Eliminar registros de una medida en una fecha específica",
+        description="Endpoint para eliminar todos los registros asociados a una medida de un PPDA en una fecha específica",
+        request=serializers.Serializer(
+            {
+                "ppda": serializers.CharField(),
+                "medida": serializers.CharField(),
+                "fecha": serializers.DateField(format="%Y-%m-%d")
+            }
+        ),
+        responses={
+            200: OpenApiResponse(
+                response=serializers.Serializer(
+                    {"message": serializers.CharField()}
+                ),
+                description="Registros eliminados correctamente"
+            ),
+            400: OpenApiResponse(
+                response=serializers.Serializer(
+                    {"error": serializers.CharField()}
+                ),
+                description="Error en la solicitud"
+            ),
+            404: OpenApiResponse(
+                response=serializers.Serializer(
+                    {"error": serializers.CharField()}
+                ),
+                description="No se encontró la medida o el PPDA"
+            ),
+        },
+    )
     def post(self, request):
-        serializer = IndicadorSerializer(data=request.data)
-        if serializer.is_valid():
-            ppda = get_object_or_404(Ppda, nombre=serializer.validated_data["ppda"])
-            print("=========")
-            print(f"ppda => {ppda}")
-            # Organismo debe ser leido desde el usuario
-            ppda_organismo = PpdaOrganismo.objects.filter(ppda=ppda, organismo__nombre="seremi_1").first()
-            if ppda_organismo is not None:
-                print(f"ppda_organismo => {ppda_organismo}")
-                medida = get_object_or_404(Medida, nombre=serializer.validated_data["medida"])
-                print(f"medida => pk:{medida.pk} {medida}")
-                try:
-                    with transaction.atomic():
-                        for indicador_nombre in ["charlas_realizadas","charlas_programadas"]:
-                            indicador = get_object_or_404(Indicador, nombre=indicador_nombre)
-                            print(f"indicador {indicador.pk} {indicador.nombre}")
-                            medida_indicador = MedidaIndicador.objects.create(
-                                medida=medida,
-                                indicador=indicador,
-                                valor=serializer.validated_data[indicador.nombre],
-                                periodo=serializer.validated_data["periodo"],
-                                )
-                            print(f"-> {medida_indicador}")
-                except Exception as e:
-                    print(f"Error: {e}")
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-                return Response({"message": f"ok"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-'''
+        """
+        Elimina todos los registros asociados a una medida dentro de un PPDA
+        para una fecha específica, usando POST.
+        """
+        usuario = request.user
+        ppda_nombre = request.data.get("ppda")
+        medida_nombre = request.data.get("medida")
+        fecha_str = request.data.get("fecha")
 
+        if not ppda_nombre or not medida_nombre or not fecha_str:
+            return Response({"error": "PPDA, Medida y Fecha son requeridos."}, status=status.HTTP_400_BAD_REQUEST)
+
+        ppda = get_object_or_404(Ppda, nombre=ppda_nombre)
+        medida = get_object_or_404(ppda.medidas, nombre__iexact=medida_nombre)
+
+        permiso = usuario_tiene_acceso_a_medida(usuario, medida)
+        if not permiso:
+            raise Http404("Usuario no autorizado para eliminar registros de esta medida")
+
+        ppda_medida = get_object_or_404(PpdaMedida, ppda=ppda, medida=medida)
+
+        try:
+            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        except ValueError:
+            raise Http404("Fecha no válida. Debe seguir el formato YYYY-MM-DD.")
+
+        try:
+            # Iniciar la transacción
+            with transaction.atomic():
+                # Eliminar todos los registros relacionados con esta medida y la fecha específica
+                registros = Registro.objects.filter(ppda_medida=ppda_medida, fecha=fecha)
+                registros.delete()
+
+        except Exception as e:
+            # Manejo de errores
+            print(f"Error: {e}")
+            raise Http404("Error al intentar eliminar los registros")
+
+        return Response({"message": "Registros eliminados correctamente"}, status=status.HTTP_200_OK)
+    
 class Healthy(APIView):
     permission_classes = [AllowAny]
     @extend_schema(
