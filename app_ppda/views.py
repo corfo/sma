@@ -1,17 +1,22 @@
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
+from django.http import HttpResponseForbidden
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from drf_spectacular.utils import extend_schema
 from .serializers import IndicadorSerializer
-from .models import Ppda, PpdaOrganismo, Medida, Indicador, MedidaIndicador
+from .models import Indicador, PpdaMedida
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from dal import autocomplete
+from django.utils.html import escape
+from django.http import HttpResponseForbidden
+
 
 
 # Create your views here.
-
+'''
 class Add(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(
@@ -63,6 +68,7 @@ class Add(APIView):
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 return Response({"message": f"ok"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
 
 class Healthy(APIView):
     permission_classes = [AllowAny]
@@ -82,3 +88,28 @@ class Healthy(APIView):
     )
     def post(self, request):
         return Response({"message": "Estoy aqui"}, status=201)
+    
+class IndicadorAutocomplete(autocomplete.Select2QuerySetView):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_staff:
+            return HttpResponseForbidden("No tienes permisos para usar esta vista.")
+        return super().dispatch(request, *args, **kwargs)
+        
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Indicador.objects.none()
+
+        qs = Indicador.objects.all()
+
+        ppda_medida_id = self.forwarded.get('ppda_medida', None)
+        if ppda_medida_id:
+            try:
+                ppda_medida = PpdaMedida.objects.get(pk=ppda_medida_id)
+                qs = qs.filter(medida=ppda_medida.medida)
+            except PpdaMedida.DoesNotExist:
+                qs = Indicador.objects.none()
+
+        if self.q:
+            qs = qs.filter(nombre__icontains=self.q)
+
+        return qs

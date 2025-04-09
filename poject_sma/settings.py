@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'drf_spectacular',
     'app_ppda',
+    'drf_spectacular',
+    "dal",
+    "dal_select2",
 ]
 
 MIDDLEWARE = [
@@ -90,7 +92,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'Amdni842',
         'HOST': 'localhost',
-        'PORT': '55432',
+        'PORT': '60000',
     }
 }
 
