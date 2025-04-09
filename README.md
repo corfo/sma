@@ -43,3 +43,10 @@ inner join app_ppda_medida t5 on t5.id = t4.medida_id
 inner join app_ppda_medidaindicador t6 on t6.medida_id = t5.id  
 inner join app_ppda_indicador t7 on t7.id = t6.indicador_id  
 ```
+
+# Usuarios
+
+seguridad
+transporte
+
+pass Password.123

@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.models import Group
 
 class Comuna(models.Model):
     nombre = models.CharField(max_length=100, unique=True, null=False, blank=False)
@@ -13,6 +13,8 @@ class Comuna(models.Model):
 
 class Organismo(models.Model):
     nombre = models.CharField(max_length=100, unique=True, null=False, blank=False)
+    grupo = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
+
 
     def __str__(self):
         return f"{self.nombre}"
@@ -74,6 +76,8 @@ class PpdaMedida(models.Model):
     medida = models.ForeignKey("Medida", on_delete=models.CASCADE)
     fecha_asignacion = models.DateField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.ppda.nombre} {self.medida.nombre}"
     class Meta:
         db_table = 'ppda_medidas'
         unique_together = ('ppda', 'medida')
