@@ -14,6 +14,7 @@ from django.utils.html import escape
 from django.http import HttpResponseForbidden
 from rest_framework.generics import ListAPIView
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 
 # Create your views here.
@@ -64,6 +65,11 @@ class Add(APIView):
     )
     def post(self, request):
         usuario = request.user
+        if not request.user.has_perm('app_ppda.add_registro'):
+            return Response(
+                {"error": "No tienes permiso para agregar registros."},
+                status=status.HTTP_403_FORBIDDEN
+                )
         serializer = RegistroDinamicoSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -147,6 +153,11 @@ class DeleteRegistrosAPIView(APIView):
         para una fecha específica, usando POST.
         """
         usuario = request.user
+        if not request.user.has_perm('app_ppda.delete_registro'):
+            return Response(
+                {"error": "No tienes permiso para agregar registros."},
+                status=status.HTTP_403_FORBIDDEN
+                )
         ppda_nombre = request.data.get("ppda")
         medida_nombre = request.data.get("medida")
         fecha_str = request.data.get("fecha")
