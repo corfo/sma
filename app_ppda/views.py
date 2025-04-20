@@ -15,6 +15,7 @@ from django.http import HttpResponseForbidden
 from rest_framework.generics import ListAPIView
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from datetime import datetime
 
 
 # Create your views here.
@@ -201,7 +202,7 @@ class Healthy(APIView):
         responses={200: {"type": "string"}},
     )
     def get(self, request):
-        return Response({"message": "Estoy aqui"})
+        return Response({"message": "Estoy aqui", "date": datetime.now().isoformat()})
 
     @extend_schema(
         summary="Healthy endpoint - POST",
