@@ -13,7 +13,7 @@ class HealthyTests(TestCase):
             mock_datetime.now.return_value = datetime.fromisoformat(fecha_esperada)
             response = self.client.get('/api/healthy/')
             self.assertEqual(response.status_code, 200)
-            self.assertJSONEqual(response.content, {"message": "Estoy aqui", "date": fecha_esperada})
+            self.assertJSONEqual(response.content, {"message": "Estoy aqui y bien", "date": fecha_esperada})
 
     def test_healthy_post(self):
         response = self.client.post('/api/healthy/')

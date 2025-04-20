@@ -202,7 +202,7 @@ class Healthy(APIView):
         responses={200: {"type": "string"}},
     )
     def get(self, request):
-        return Response({"message": "Estoy aqui", "date": datetime.now().isoformat()})
+        return Response({"message": "Estoy aqui y bien", "date": datetime.now().isoformat()})
 
     @extend_schema(
         summary="Healthy endpoint - POST",
