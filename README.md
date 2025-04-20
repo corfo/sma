@@ -55,15 +55,15 @@ pass Password.123
 
 ## POSTGRES ONLINE
 ```
-python manage.py migrate --setting=poject_sma.settings_pro
+python manage.py migrate --settings=poject_sma.settings_pro
 ```
 
 ## POSTGRES LOCAL
 ```
-python manage.py migrate --setting=poject_sma.settings_dev
+python manage.py migrate --settings=poject_sma.settings_dev
 ```
 
 ## SQLITE
 ```
-python manage.py migrate --setting=poject_sma.settings_test
+python manage.py migrate --settings=poject_sma.settings_test
 ```
