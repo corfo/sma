@@ -50,3 +50,20 @@ seguridad
 transporte
 
 pass Password.123
+
+# Ejecucion en distintos entornos
+
+## POSTGRES ONLINE
+```
+python manage.py migrate --setting=poject_sma.settings_pro
+```
+
+## POSTGRES LOCAL
+```
+python manage.py migrate --setting=poject_sma.settings_dev
+```
+
+## SQLITE
+```
+python manage.py migrate --setting=poject_sma.settings_test
+```
