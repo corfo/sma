@@ -66,11 +66,14 @@ class Add(APIView):
     )
     def post(self, request):
         usuario = request.user
+        print("USER AUTHENTICADO")
         if not request.user.has_perm('app_ppda.add_registro'):
+            print("NO TIENEN PERMISOS")
             return Response(
                 {"error": "No tienes permiso para agregar registros."},
                 status=status.HTTP_403_FORBIDDEN
                 )
+        print("SI TIENEN PERMISOS")
         serializer = RegistroDinamicoSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
