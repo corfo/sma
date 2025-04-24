@@ -16,6 +16,12 @@ from rest_framework.generics import ListAPIView
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from datetime import datetime
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 # Create your views here.
@@ -40,6 +46,7 @@ class PpdaListAPIView(ListAPIView):
         },
     )
     def get(self, request, *args, **kwargs):
+        logging.INFO("DICE /api/all/")
         return super().get(request, *args, **kwargs)
             
 class Add(APIView):
@@ -65,6 +72,7 @@ class Add(APIView):
 
     )
     def post(self, request):
+      try:
         usuario = request.user
         print("USER AUTHENTICADO")
         if not request.user.has_perm('app_ppda.add_registro'):
@@ -114,8 +122,11 @@ class Add(APIView):
                     )
         except Exception as e:
             print(f"Error: {e}")
-            raise Http404("Indicador ya ingresado")            
+            raise Http404("Error en insert a db, Indicador ya ingresado")            
         return Response({"message": "Registros creados correctamente"}, status=status.HTTP_201_CREATED)
+      except Exception as ex:
+          logging.error(f"ERROR EN ADD {ex}")
+          raise Http404(f"Error en ADD {ex}")            
 
 class DeleteRegistrosAPIView(APIView):
     permission_classes = [IsAuthenticated]
