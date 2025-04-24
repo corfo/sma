@@ -1,8 +1,7 @@
-import os, sys
 from funciones import eliminarRegistros
-ruta_token = os.path.abspath(".venv")
-sys.path.append(ruta_token)
-import token_users as t
+from os import environ
+from dotenv import load_dotenv
+load_dotenv()
 
-eliminarRegistros('MTT',t.mtt_user_token)
-eliminarRegistros('CONAF',t.conaf_user_token)
+eliminarRegistros('MTT',environ.get("mtt_user_TOKEN"))
+eliminarRegistros('CONAF',environ.get("conaf_user_TOKEN"))

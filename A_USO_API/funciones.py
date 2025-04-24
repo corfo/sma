@@ -45,3 +45,27 @@ def eliminarRegistros(organismo, user_token):
             unicos.append(item)
     for registro in unicos:
         eliminarRegistro(registro,user_token)
+
+def actualizarEnvConToken(user, jwt_token):
+    env_file = '.env'
+    if os.path.exists(env_file):
+        with open(env_file, 'r') as file:
+            lines = file.readlines()
+
+        # Eliminar cualquier línea que defina USER_X_TOKEN
+        new_lines = []
+        for line in lines:
+            if not line.startswith(f'{user}_TOKEN='):
+                # Asegurar que cada línea termine con \n
+                if not line.endswith('\n'):
+                    line += '\n'
+                new_lines.append(line)
+
+        # Agregar la nueva línea con el token
+        new_lines.append(f'{user}_TOKEN={jwt_token}\n')
+
+        # Escribir el archivo actualizado
+        with open(env_file, 'w') as file:
+            file.writelines(new_lines)
+    else:
+        print("Archivo .env no encontrado.")
