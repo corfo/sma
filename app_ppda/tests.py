@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from datetime import datetime
 from unittest.mock import patch
+from rest_framework.test import APITestCase, APIClient
+from django.contrib.auth.models import User
 
 # Test del endpoint ping
 class HealthyTests(TestCase):
@@ -20,9 +22,34 @@ class HealthyTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertJSONEqual(response.content, {"message": "Estoy aqui"})
 
-class AllTests(TestCase):
+class AllTests(APITestCase):
     def setUp(self):
-        self.client= Client()
+        self.client = APIClient()
+        self.username = "testuser"
+        self.password = "strongpassword123"
+        self.user = User.objects.create_user(username=self.username, password=self.password)
+
     def test_AllFail(self):
-        response =self.client.get('/api/all/')
-        self.assertEqual(response.status_code,401)
+        # Sin autenticación
+        response = self.client.get('/api/all/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_AllSuccess(self):
+        # Obtener token JWT
+        response = self.client.post('/api/token/', {
+            "username": self.username,
+            "password": self.password
+        }, format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        # Extraer token de acceso
+        token = response.data.get("access")
+        self.assertIsNotNone(token)
+
+        # Autenticar cliente con el token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        # Acceder al endpoint protegido
+        response = self.client.get('/api/all/')
+        self.assertEqual(response.status_code, 200)
