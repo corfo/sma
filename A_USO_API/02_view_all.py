@@ -1,14 +1,13 @@
 import requests
 import json
-import sys
-import os
-from funciones import log, err
-ruta_token = os.path.abspath(".venv")
-sys.path.append(ruta_token)
-import token_users as t
+from funciones import log
+from os import environ
+from dotenv import load_dotenv
+load_dotenv()
 
-url=f"{t.url}/api/all/"
-headers = {"Authorization": f"Bearer {t.mtt_user_token}"}
+
+url=f"{environ.get("RENDER_URL")}/api/all/"
+headers = {"Authorization": f"Bearer {environ.get("mtt_user_TOKEN")}"}
 log(url)
 response = requests.get(url, headers=headers)
 log(f"\n{json.dumps(response.json(), indent=4)}")

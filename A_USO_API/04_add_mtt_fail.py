@@ -1,15 +1,14 @@
 import requests
 import json
-import sys
-import os
-from funciones import log, err, eliminarRegistros
-ruta_token = os.path.abspath(".venv")
-sys.path.append(ruta_token)
-import token_users as t
+from funciones import log
 import random
+from os import environ
+from dotenv import load_dotenv
+load_dotenv()
+
 #######################
-url=f"{t.url}/api/add/"
-headers = {"Authorization": f"Bearer {t.mtt_user_token}"}
+url=f"{environ.get("RENDER_URL")}/api/add/"
+headers = {"Authorization": f"Bearer {environ.get("mtt_user_TOKEN")}"}
 data = {
     "ppda" : "PPDA QUINTERO",
     "medida": "CORTA FUEGOS",
