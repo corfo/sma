@@ -46,7 +46,7 @@ class PpdaListAPIView(ListAPIView):
         },
     )
     def get(self, request, *args, **kwargs):
-        logging.INFO("DICE /api/all/")
+        logging.info("DICE /api/all/")
         return super().get(request, *args, **kwargs)
             
 class Add(APIView):
